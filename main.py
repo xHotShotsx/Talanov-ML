@@ -15,4 +15,13 @@ df = pd.DataFrame(bits, columns=TYPES)
 df["popcount"] = bits.sum(axis=1)
 df["is_octad"] = df["popcount"] == 8
 df["valid"]   = df["popcount"] < 16            # drop the degenerate all-1 row
-df.to_csv("Data/dichotomies.csv", index=False)
+# df.to_csv("Data/dichotomies.csv", index=False)
+
+items = pd.read_csv("Data/items.csv")
+bool_cols = [f"{t}_bool" for t in TYPES]
+X = items[bool_cols].to_numpy(dtype=np.uint8)
+
+pole = np.where(X[:, 0] == 1, 1, -1)     # +1 if ILE is 1, else -1
+X = np.where(X[:, :1] == 1, X, 1 - X)    # flip rows where ILE was 0
+items_norm = pd.DataFrame(X, columns=TYPES)
+items_norm["pole"] = pole
